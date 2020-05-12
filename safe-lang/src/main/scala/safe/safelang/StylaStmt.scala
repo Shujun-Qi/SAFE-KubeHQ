@@ -229,6 +229,7 @@ class StyStmt(val styterms: List[StyTerm], val vmap: LinkedHashMap[String, StyVa
     toString(".", self) 
   }
 
+  // Pretty print for statement output to a SAFE certificate
   def toString(endsWith: String, speaker: String = ""): String = {
     val sb = new StringBuilder 
     //println(s"\n[StylaStmt toString] ${this}")
@@ -246,12 +247,18 @@ class StyStmt(val styterms: List[StyTerm], val vmap: LinkedHashMap[String, StyVa
         }
       }
     }
+    // println(s"Get a StylaStatement as String")
+    // println(s"StylaStatement: ${toString}")
+    // println(s"StylaStatement string: ${sb.toString}")
+    // scala.io.StdIn.readLine()
     sb.toString()
   }
 
+  // @DeveloperAPI
   override def toString(): String = {
     s"StyStmt(${styterms}, ${vmap})"
   }
+  // TODO: consider adding a logging layer for recording pretty printed statements
 }
 
 object StyStmt {
@@ -370,9 +377,12 @@ object StyStmtHelper {
     }
   }
 
-  val symPattern = """([a-z][a-zA-Z0-9]*)""".r
+  val symPattern = """([a-z]\w*)""".r  // \w includes _
   val ipv4Pattern = """ipv4"(.*)""".r
   val portPattern = """port"(.*)""".r
+  val consPattern = """(^\[.*\]$)""".r
+  // val consPattern = """(^\[[_a-zA-Z][\w\s,]*\]$)""".r
+
 
   val styInfixMap: Map[String, String] = Map(":"->":", "isInRange"->"<:", "is_nonnum"->":=", "."->"|", "eq"->"=") 
   def styTermToString(t: StyTerm, rvmap: LinkedHashMap[StyVar, String], sb: StringBuilder, self: String): Unit = {
@@ -435,6 +445,7 @@ object StyStmtHelper {
           case symPattern(t) => sb.append(c.sym) 
           case ipv4Pattern(t) => sb.append(c.sym)
           case portPattern(t) => sb.append(c.sym)
+          case consPattern(t) => sb.append(c.sym) //println(s"Cons pattern matched: ${c.sym}"); scala.io.StdIn.readLine(); sb.append(c.sym)
           case _ =>         // strings that need single quotes 
             sb.append("'") 
             sb.append(c.sym)  
