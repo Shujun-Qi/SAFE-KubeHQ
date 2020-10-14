@@ -103,7 +103,7 @@ class DataBase(fname: String) extends LinkedHashMap[String, Deque[List[Term]]] w
             else
               IO.warnmes("bad directive: " + c)
 
-          case other => exec_cmd(b :: bs)
+          case _ => exec_cmd(b :: bs)
         }
         true
       }
@@ -207,6 +207,10 @@ class DataBase(fname: String) extends LinkedHashMap[String, Deque[List[Term]]] w
     if(rule_r1 != null)  return rule_r1
     null
   } 
+
+  override def size(): Int = {
+    numstmts
+  }
 
   def del1(h: Term, k: String, table: MutableMap[String, Deque[List[Term]]]): List[Term] = {
     val xss = table.get(k)

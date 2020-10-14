@@ -12,7 +12,8 @@ final class Cons(h: Term, b: Term)
   }
 
   override def toString =
-    Cons.to_string_raw({ x => x.toString }, this)
+    // Cons.to_string_raw({ x => x.toString }, this)
+    Cons.to_string({ x => x.toString }, this)
 }
 
 object Cons {
@@ -40,6 +41,7 @@ object Cons {
     to_string( { x => x.toString }, c, vmap)
   }
 
+  val numPattern = """-?(\d+)(\.\d+)?""".r
   val symPattern = """([a-z]\w*)""".r
   // val consPattern = """(^\[[_a-zA-Z][\w\s,]*\]$)""".r
   val consPattern = """(^\[.*\]$)""".r
@@ -50,6 +52,7 @@ object Cons {
     } else {
       val _t = f(e)
       _t match {
+        case numPattern(t) => _t
         case symPattern(t) => _t
         case consPattern(t) => _t // println(s"Cons pattern matched: ${_t}"); scala.io.StdIn.readLine(); _t
         case _ => s"'${_t}'" // println(s"added single quotes: ${_t}   ${_t.getClass}"); scala.io.StdIn.readLine(); s"'${_t}'" 
