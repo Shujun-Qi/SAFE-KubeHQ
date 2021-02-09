@@ -194,8 +194,8 @@ object Resolvers {
   val commonResolvers = Seq(
       "sonatype snapshots"     at "https://oss.sonatype.org/content/repositories/snapshots/"
     , "spray repo"             at "http://repo.spray.io/"
-    , "typesafe repo"          at "http://repo.typesafe.com/typesafe/releases/"
-    , "bintray/non"            at "http://dl.bintray.com/non/maven"
+    , "typesafe repo"          at "https://repo.typesafe.com/typesafe/releases/"
+    , "bintray/non"            at "https://dl.bintray.com/non/maven"
     , "local maven repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository" 
   )
 }
