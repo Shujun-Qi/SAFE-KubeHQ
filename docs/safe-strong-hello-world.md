@@ -79,21 +79,21 @@ strong-1@slang> ?ServerJVM := "localhost:7777".
 # identity of that principal. Strong-client script does the initial
 # ?Self := "strong-1" assignment
 
-strong-1@slang> ?P1 := postRawIdSet("strong-1").
-strong-1@slang> ?Self := "strong-2".
-strong-2@slang> ?P2 := postRawIdSet("strong-2").
-strong-2@slang> ?Self := "strong-3".
-strong-3@slang> ?P3 := postRawIdSet("strong-3").
-strong-3@slang> ?Self := "strong-4".
-strong-4@slang> ?P4 := postRawIdSet("strong-4").
-strong-4@slang> ?Self := "strong-5".
-strong-5@slang> ?P5 := postRawIdSet("strong-5").
+?P1 := postRawIdSet("strong-1").
+?Self := "strong-2".
+?P2 := postRawIdSet("strong-2").
+?Self := "strong-3".
+?P3 := postRawIdSet("strong-3").
+?Self := "strong-4".
+?P4 := postRawIdSet("strong-4").
+?Self := "strong-5".
+?P5 := postRawIdSet("strong-5").
 
 # Create 4 UUIDs for namespaces
-strong-5@slang> ?UUID1 := "6ec7211c-caaf-4e00-ad36-0cd413accc91".
-strong-5@slang> ?UUID2 := "1b924687-a317-4bd7-a54f-a5a0151f49d3".
-strong-5@slang> ?UUID3 := "26dbc728-3c8d-4433-9c4b-2e065b644db5".
-strong-5@slang> ?UUID4 := "1ef7e6dd-5342-414e-8cce-54e55b3b9a83".
+?UUID1 := "6ec7211c-caaf-4e00-ad36-0cd413accc91".
+?UUID2 := "1b924687-a317-4bd7-a54f-a5a0151f49d3".
+?UUID3 := "26dbc728-3c8d-4433-9c4b-2e065b644db5".
+?UUID4 := "1ef7e6dd-5342-414e-8cce-54e55b3b9a83".
 
 # Create a namespace hierarchy rooted at $P1:$UUID1 and chain
 # delegations of sub-namespace along a path from the root to

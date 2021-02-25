@@ -44,7 +44,7 @@ The standard setup uses python-dependent utilities in the safe repo to generate 
 Once your [Riak container is up](safe-docker.md), launch your safe-server.  Run it to load the `links` slang script.  This is a different script from the strong example: you can just kill the safe-server and restart it with the links script.  From within the top-level directory of a SAFE repo clone:
 
 ```
-(~/SAFE/)$ sbt "project safe-server" "run -f ../safe-apps/impact/links.slang -r safeService  -kd  ~/safe-scratch/principalkeys"
+(~/SAFE/)$ sbt "project safe-server" "run -f ../safe-apps/examples/links.slang -r safeService  -kd  ~/safe-scratch/principalkeys"
 ```
 
 This just says to launch a SAFE process in the safeService role with the the links script file and the specified key directory.  By default the server serves on `localhost:7777`.  The slang-shell finds it there automatically, but you can give it a command to talk to a different IP address or port.  
@@ -60,7 +60,7 @@ Once the safe-server is up, launch your slang-shell in a different terminal.  Fr
 You get a slang-shell command prompt.  You now begin typing commands to slang-shell.  First, import the `links-client` script.
 
 ```
-import("safe-apps/impact/links-client.slang").
+import("safe-apps/examples/links-client.slang").
 ```
 
 By default it finds the safe-server at localhost:7777, as in the standard setup.  You can optionally issue a command to tell it where the safe-server is, by saying something like:

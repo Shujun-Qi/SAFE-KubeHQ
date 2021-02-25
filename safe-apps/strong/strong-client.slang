@@ -1,8 +1,7 @@
 import("../safe-client.slang").
 
-defenv ServerJVM() :- "152.3.136.26:6666".
+defenv ServerJVM() :- "localhost:7777".
 defenv ReqEnvs() :- ":::".
-defenv Self() :- "strong-1".
 
 defcall postGroupMember(?GroupId, ?SubjectId, ?Delegatable) :-
   {

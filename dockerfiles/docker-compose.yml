@@ -9,6 +9,9 @@ services:
     container_name: riak
     hostname: riak
     command: tail -f /dev/null
+    ports:
+      - '8098:8098'
+      - '8087:8087'
 
   safe:
     image: safe.local:latest
