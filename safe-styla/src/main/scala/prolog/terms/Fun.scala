@@ -34,9 +34,13 @@ class Fun(sym: String, var args: Array[Term]) extends Const(sym) with LazyLoggin
   def isFirstParamConstant(): Boolean = {
     if(isSpk) {
       if(args.length == 2) {
-        getArg(1) match {
-          case f: Fun => f.isFirstParamConstant() 
-          case _ => throw new RuntimeException(s"Atom does not contain a valid predicate: ${getArg(1)}") 
+        getArg(0) match {
+          case s: Const =>  // Speaker must be constant in order to use the secondary index
+            getArg(1) match {
+              case f: Fun => f.isFirstParamConstant() 
+              case _ => throw new RuntimeException(s"Atom does not contain a valid predicate: ${getArg(1)}") 
+          }
+          case _ => false
         }
       } else {
         throw new RuntimeException(s"Invalid atom body: ${this}")
@@ -109,7 +113,16 @@ class Fun(sym: String, var args: Array[Term]) extends Const(sym) with LazyLoggin
     if(isSpk) {
       if(args.length == 2) {
         getArg(1) match {
-          case f: Fun => f.secondaryIndex() 
+          case f: Fun =>
+            val sb = new StringBuffer()
+            getArg(0) match {
+              case speaker: Const =>   // speaker + predicate + arity + 1st_param
+                sb.append(speaker.sym)
+                sb.append(f.secondaryIndex())
+                sb.toString
+              case _ =>
+                f.secondaryIndex()
+            } 
           case _ => throw new RuntimeException(s"Atom does not contain a valid predicate: ${getArg(1)}") 
         }
       } else {

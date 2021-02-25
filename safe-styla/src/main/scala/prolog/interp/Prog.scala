@@ -198,7 +198,7 @@ class Prog(var db: DataBase) extends TermSource with LazyLogging {
     while (more && !orStack.isEmpty && depth<=DEPTH_LIMIT) {
       val step: Unfolder = orStack.top
 
-      if (step.isLastClause && !orStack.isEmpty) {
+      if (step.isLastClause) { // orStack.isEmpty == true
         orStack.pop()
         popped = true
       } else
@@ -208,13 +208,13 @@ class Prog(var db: DataBase) extends TermSource with LazyLogging {
         //println("step="+step)
         newgoal = step.nextGoal()
      
-        // Don't immediately pop an exhausted unfolder
+        // Don't immediately check and pop an exhausted unfolder
         // This keeps the entire proof of an inference on the stack
 
         val res = pushUnfolder(newgoal)
 
-        println(s"Pushing an unfolder to the orStack: ${res._1}  {res._2}")
-        println(s"orStack: ${orStack}")
+        //println(s"Pushing an unfolder to the orStack: ${res._1}  {res._2}")
+        //println(s"orStack: ${orStack}")
 
         if (null != res._2) return res._2
         newgoal = res._1
