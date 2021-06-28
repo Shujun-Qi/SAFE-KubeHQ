@@ -25,8 +25,36 @@ defcon addPropertySpec(?Prohibited, ?Qualifiers, ?Required) :-
     label("specification").
 }.
 
+defcon addFilePropertySpec(?File, ?Policy, ?Prohibited, ?Qualifiers, ?Required) :-
+{
+    specProhibited($File, $Policy, $Prohibited).
+    specQualifiers($File, $Policy, $Qualifiers).
+    specRequired($File, $Policy, $Required).
+    label("specification/$File/$Policy").
+}.
 defpost postPropertySpec(?Prohibited, ?Qualifiers, ?Required) :-
   [addPropertySpec(?Prohibited, ?Qualifiers, ?Required)].
+
+defpost postFilePropertySpec(?File, ?Policy, ?Prohibited, ?Qualifiers, ?Required) :-
+  [addPropertySpec(?File, ?Policy, ?Prohibited, ?Qualifiers, ?Required)].
+
+defcon addImageSpec(?ImageList) :-
+{
+    specImages($ImageList).
+    label("specification").
+}.
+
+defcon addFileImageSpec(?File, ?Policy, ?ImageList) :-
+{
+    specImages($File, $Policy, $ImageList).
+    label("specification/$File/$Policy").
+}.
+
+defpost postImageSpec(?Image) :-
+  [addImageSpec(?Image)].
+
+defpost postFileImageSpec(?File, ?Policy, ?Image) :-
+  [addFileImageSpec(?File, ?Policy, ?Image)].
 
 defguard verifyAttestation(?PID) :-
   ?ListRules := listMatchingRules(),
@@ -41,6 +69,24 @@ defguard verifyAttestation(?PID) :-
   approveByQualifiers($PID)? =@= allow
   approveByRequired($PID)? =@= allow
   denyByProhibited($PID)? =@= deny
+}.
+
+defguard checkSubSeq(?Spec, ?Config) :-
+  ?ListRules := listMatchingRules(),
+  ?PropertyPolicy := label("std-property-policy"),
+{
+  link($ListRules).
+  link($PropertyPolicy).
+  esubseq($Spec, $Config)?
+}.
+
+defguard checkPresent(?Spec, ?Config) :-
+  ?ListRules := listMatchingRules(),
+  ?PropertyPolicy := label("std-property-policy"),
+{
+  link($ListRules).
+  link($PropertyPolicy).
+  propsPresent($Spec, $Config)?
 }.
 
 defcon propertyListPolicy() :-
@@ -74,6 +120,32 @@ subseq([H|L], [S|R]) :-
    subseq([H|L], R).
 subseq([], R).
 
+// Test if L is an extended subsequence of R.
+esubseq([[X,Y]|L], [[X,Y]|R]) :-
+   esubseq(L, R).
+esubseq([[H,Y]|L], [[S,_]|R]) :-
+   S < H,
+   esubseq([[H,Y]|L], R).
+esubseq([], R).
+
+// Test if L and R intersect
+intersecting([E|_], [E|_]).
+intersecting([S|L], R) :-
+  [H|_] = R,
+  S < H,
+  intersecting(L, R).
+intersecting(L, [S|R]) :-
+  [H|_] = L,
+  S < H,
+  intersecting(L, R).
+
+// Test if L is a extended subsequence of any element in right hand side
+//esubseq([], R).
+//esubseq([Head|_], R) :-
+//   esubseq(Head, R).
+//esubseq([_|Rest], R) :-
+//   esubseq(Rest, R).
+
 // Test if each property K in L corresponds to a [K,V] pair in R.
 propsPresent([], R).
 propsPresent([K|L], [[K,_]|R]):-
@@ -82,6 +154,11 @@ propsPresent(L, [[S,_]|R]):-
   [H|_] = L,
   S < H,
   propsPresent(L, R).
+
+//propsPresent([Head|_], R) :-
+//  propsPresent(Head, R).
+//propsPresent([_|Rest], R) :-
+//  propsPresent(Rest, R).
 
 // Test if any property K in L corresponds to a [K,V] pair in R.
 anyPropPresent([K|_],[[K,_]|_]).
@@ -93,6 +170,13 @@ anyPropPresent([S|L], R) :-
   [[H,_]|_] = R,
   S < H,
   anyPropPresent(L,R).
+
+//anyPropPresent([Head | _], R) :-
+//  anyPropPresent(Head, R).
+//
+//anyPropPresent([_| Rest], R) :-
+//  anyPropPresent(Rest, R).
+
 
   label("property-list-rules").
 }.
