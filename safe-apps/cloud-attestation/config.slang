@@ -1,0 +1,140 @@
+import("./plist.slang").
+
+// Adapted from Latte's policy.slang.  Experimental new approach.
+// A ConfigSet has exactly three lists (known as PQR) for each eligible named image.
+// They are: Prohibited arg keys, Qualifying values for arg keys, and Required arg keys.
+// If any PQR list is not present, then the image is not eligible (not whitelisted).
+// Each PQR list is a keyset: a sorted list of keys with optional values (called k-list or k+v list).
+// P and R are k-lists, and Q is a k+v list.
+//
+// These keysets are asserted in predicates called prohibited, required, and qualifier.
+// Keyed by ConfigSetID and Image.
+// Grouped in a single set labeled as ConfigSets/ConfigSetID.
+//
+// Note error rakes:
+// - Results are indeterminate if any PQR list is unsorted, or if any image is missing
+// any PQR list, or if an image has more than one list for any PQR in the ConfigSet.
+
+defcon createProhibited(?ConfigSetID, ?ImageID, ?PKeyset) :-
+{
+    prohibited($ConfigSetID, $ImageID, $PKeyset).
+    label("ConfigSets/$ConfigSetID").
+}.
+
+defcon createRequired(?ConfigSetID, ?ImageID, ?RKeyset) :-
+{
+    required($ConfigSetID, $ImageID, $RKeyset).
+    label("ConfigSets/$ConfigSetID").
+}.
+
+defcon createQualifier(?ConfigSetID, ?ImageID, ?QKeyset) :-
+{
+    qualifier($ConfigSetID, $ImageID, $QKeyset).
+    label("ConfigSets/$ConfigSetID").
+}.
+
+defpost postProhibited(?ConfigSetID, ?ImageID, ?ConfProhibited) :-
+    [createProhibited(?ConfigSetID, ?ImageID, ?ConfProhibited)].
+
+defpost postRequired(?ConfigSetID,  ?ImageID, ?ConfRequired) :-
+    [createRequiredKeysPolicy(?ConfigSetID, ?ImageID, ?ConfRequired)].
+
+defpost postQualifier(?ConfigSetID, ?ImageID, ?ConfQualifiers) :-
+    [createQualifier(?ConfigSetID, ?ImageID, ?ConfQualifiers)].
+
+//
+// Config
+// Config describes an instance e.g., a pod.  It has a list of named subinstances (e.g., containers),
+// each of which has an image and an arg keyset.  The subinstances are listed in a keyset named
+// "subinstances".  There may be other named keysets for the instance.
+// [Other named keysets for instance such as "global" are not currently used for matching.]
+// We use two Config predicates: configInstance and configSubinstance.
+// Config statements for an instance appear in a single set labeled instance/$Instance.
+//
+defcon consInstanceConfig(?Instance,?ConfigKey,?Value) :-
+{
+    configInstance($Instance, $ConfigKey, $Value).
+    label("instance/$Instance").
+}.
+defpost postInstanceConfig(?Instance,?ConfigKey,?Value) :-
+    [ consInstanceConfig(?Instance,?ConfigKey,?Value) ].
+
+defcon consSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) :-
+{
+    configSubinstance($Subinstance, $Instance, $Image, $ArgKeyset).
+    label("instance/$Instance").
+}.
+defpost postSubinstanceConfig(?Subinstance, ?Instance,?Image,?ArgKeyset) :-
+    [ consInstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) ].
+
+
+
+defcon dtorInstanceConfigList(?Instance,?Config,?Value) :-
+{
+    config($Instance, $Config, $Value)~
+    label("instance/$Instance").
+    invalid().
+}.
+defpost delInstanceConfig(?Instance,?Config,?Value) :-
+    [ dtorInstanceConfig(?Instance,?Config,?Value) ].
+
+//
+// Logic rules for match, i.e., check compliance of a Config to a ConfigSet.
+//
+
+defcon configSetMatchRules() :- 
+{
+
+    label("ConfigSetMatchRules").
+
+    configMatch(AConfig, EConfigSet) :-
+      getSubinstances(AConfig, ASubInstances),
+      compliantSubInstances(AConfig, ASubInstances, EConfigSet).
+
+    // Tail: check each subinstance of a Config against PQR for EConfigSet.
+    compliantSubinstances(AConfig, [SubInstance|Rest], EConfigSet) :- 
+      getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset),
+      compliesRequired(EConfigSet, Image, ArgKeyset),
+      compliesQualifier(EConfigSet, Image, ArgKeyset),
+      \+( violatesProhibited(EConfigSet, Image, ArgKeyset) ),
+      compliantSubinstances(AConfig, Rest, EConfigSet).
+
+    // Base case for tail recursion.
+    compliantSubonstances(_, [], _).
+
+    compliesRequired(EConfigSet, Image, ArgKeyset) :-
+      getRequiredKeyset(EConfigSet, Image, RKeyset),
+      propsPresent(RKeyset, ArgKeyset).
+//      subseq(CRequiredKeys, PList),
+
+    compliesQualifier(EConfigSet, Image, ArgKeyset) :-
+      getQualifierKeyset(EConfigSet, Image, QKeyset),
+      esubseq(QKeyset, ArgKeyset).
+
+    violatesProhibited(EConfigSet, Image, ArgKeyset) :-
+      getProhibitedKeyset(EConfigSet, Image, PKeyset),      
+      anyPropPresent(PKeyset, ArgKeySet).
+//      intersecting(CProhibitedKeys, PList) ).
+
+    getRequiredKeyset(EConfigSet, Image, RKeyset) :-
+      Owner := rootPrincipal(EConfigSet),
+      Owner:required(EConfigSet, Image, RKeyset).
+      
+    getQualifierKeyset(EConfigSet, Image, QKeyset) :-
+      Owner := rootPrincipal(EConfigSet),
+      Owner:qualifier(EConfigSet, Image, QKeyset).
+
+    getProhibitedKeyset(EConfigSet, Image, PKeyset) :-
+      Owner := rootPrincipal(EConfigSet),
+      Owner:prohibited(EConfigSet, Image, PKeyset).
+
+    getSubinstances(AConfig, ASubInstances) :-
+      Owner := rootPrincipal(AConfig),
+      Owner:configInstance(AConfig, "subinstances", ASubInstances).    
+
+    getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset) :-
+      Owner := rootPrincipal(AConfig),
+      Owner:configSubinstance(SubInstance, AConfig, Image, ArgKeyset).
+}.
+
+definit configSetMatchRules().
