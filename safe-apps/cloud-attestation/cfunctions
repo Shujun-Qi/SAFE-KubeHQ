@@ -1,0 +1,73 @@
+#!/bin/bash
+
+if [ -z "$SAFE_ADDR" ]; then
+    echo ' must set SAFE_ADDR env '
+    exit 1
+fi
+
+postInstanceConfig() {
+    local principal=$1
+    shift 1
+# ?Instance,?ConfigKey,?Value
+    curl -XPOST $SAFE_ADDR/postInstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\":\"${AUTH:-1}\"}"
+}
+
+measurePostInstanceConfig() {
+    local principal=$1
+    shift 1
+# ?Instance,?Config1,?Value1
+    curl -s -w "postInstanceConfig %{time_total}
+" -o debug.log -XPOST $SAFE_ADDR/postInstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\":\"${AUTH:-1}\"}"
+}
+
+delInstanceConfig() {
+    local principal=$1
+    shift 1
+    curl -XPOST $SAFE_ADDR/delInstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\": \"${AUTH:-1}\"}"
+}
+
+
+postSubinstanceConfig() {
+    local principal=$1
+    shift 1
+# ?Subinstance, ?Instance,?Image,?ConfigKey,?Value
+    curl -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\",\"${5}\"], \"auth\":\"${AUTH:-1}\"}"
+}
+
+measurePostSubinstanceConfig() {
+    local principal=$1
+    shift 1
+# ?Subinstance, ?Instance,?Image,?ConfigKey,?Value
+    curl -s -w "postSubinstanceConfig %{time_total}
+" -o debug.log -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\",\"${5}\"], \"auth\":\"${AUTH:-1}\"}"
+}
+
+delSubinstanceConfig() {
+    local principal=$1
+    shift 1
+# ?Subinstance, ?Instance,?Image,?ConfigKey,?Value
+    curl -XPOST $SAFE_ADDR/delSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\",\"${5}\"], \"auth\": \"${AUTH:-1}\"}"
+}
+
+
+postRequired() {
+    local principal=$1
+    shift 1
+# ?ConfigSet,?Image,?Value
+    curl -XPOST $SAFE_ADDR/postRequired -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\": \"${AUTH:-1}\"}"
+}
+
+postQualifier() {
+    local principal=$1
+    shift 1
+# ?ConfigSet,?Image,?Value
+    curl -XPOST $SAFE_ADDR/postQualifier -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\": \"${AUTH:-1}\"}"
+}
+
+postProhibited() {
+    local principal=$1
+    shift 1
+# ?ConfigSet,?Image,?Value
+    curl -XPOST $SAFE_ADDR/postProhibited -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\": \"${AUTH:-1}\"}"
+}
+
