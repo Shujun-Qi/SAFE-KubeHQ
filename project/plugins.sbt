@@ -4,7 +4,7 @@
 // which I'm guessing was inspired by Maven's assembly plugin. The goal is
 // simple: Create a fat JAR of your project with all of its dependencies.
 // https://github.com/sbt/sbt-assembly
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.5")
 
 
 //========= sbt-resolver================//
