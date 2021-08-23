@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: safe
+  name: safe
+spec:
+  ports:
+    - name: "7777"
+      port: 7777
+      targetPort: 7777
+  selector:
+    io.kompose.service: safe
+status:
+  loadBalancer: {}

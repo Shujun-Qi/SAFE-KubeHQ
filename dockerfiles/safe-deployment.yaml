@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: safe
+  name: safe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: safe
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: safe
+    spec:
+      containers:
+        - args:
+            - tail
+            - -f
+            - /dev/null
+          env:
+            - name: RIAK_IP
+              value: riak
+            - name: SLANG_CONF
+              value: strong/strong.conf.slang
+            - name: SLANG_SCRIPT
+              value: strong/strong.slang
+            - name: STRONG_ROOT_PUB
+              value: strong-1.pub
+          image: safe.local:latest
+          name: safe
+          ports:
+            - containerPort: 7777
+          resources: {}
+          volumeMounts:
+            - mountPath: /imports
+              name: safe-claim0
+            - mountPath: /principalkeys
+              name: safe-claim1
+      hostname: safe
+      restartPolicy: Always
+      volumes:
+        - name: safe-claim0
+          persistentVolumeClaim:
+            claimName: safe-claim0
+        - name: safe-claim1
+          persistentVolumeClaim:
+            claimName: safe-claim1
+status: {}
