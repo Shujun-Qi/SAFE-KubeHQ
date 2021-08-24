@@ -33,9 +33,7 @@ lazy val safeServerDeps: Seq[ModuleID] = Seq(
   spray,
   jersey,
   javax_ws_rsapi,
-  multiJVM,
-  net,
-  netty
+  multiJVM
 //  akkaHttp
 ).flatten
 
