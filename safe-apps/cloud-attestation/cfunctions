@@ -30,16 +30,16 @@ delInstanceConfig() {
 postSubinstanceConfig() {
     local principal=$1
     shift 1
-# ?Subinstance, ?Instance,?Image,?ConfigKey,?Value
-    curl -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\",\"${5}\"], \"auth\":\"${AUTH:-1}\"}"
+# ?Subinstance, ?Instance,?ConfigKey,?Value
+    curl -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\"], \"auth\":\"${AUTH:-1}\"}"
 }
 
 measurePostSubinstanceConfig() {
     local principal=$1
     shift 1
-# ?Subinstance, ?Instance,?Image,?ConfigKey,?Value
+# ?Subinstance, ?Instance,?ConfigKey,?Value
     curl -s -w "postSubinstanceConfig %{time_total}
-" -o debug.log -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\",\"${5}\"], \"auth\":\"${AUTH:-1}\"}"
+" -o debug.log -XPOST $SAFE_ADDR/postSubinstanceConfig -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\"], \"auth\":\"${AUTH:-1}\"}"
 }
 
 delSubinstanceConfig() {

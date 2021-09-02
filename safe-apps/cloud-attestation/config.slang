@@ -1,5 +1,19 @@
 import("./plist.slang").
 
+
+/*
+postProhibited cset1 image_c1 '[k5]'
+postQualifier cset1 image_c1 '[[k1,v1]]'
+postRequired cset1 image_c1 '[k1,k2]'
+postProhibited cset1 image_c2 '[k5]'
+postQualifier cset1 image_c2 '[[k4,v4]]'
+postRequired cset1 image_c2 '[k3]'
+
+postInstanceConfig kmaster pod1 subinstances '[ctn1,ctn2]'
+postSubinstanceConfig kmaster ctn1 pod1 image_c1 '[[k1,v1],[k2,v2]]'
+postSubinstanceConfig kmaster ctn2 pod1 image_c2 '[[k3,v3],[k4,v4]]'
+*/
+
 // Adapted from Latte's policy.slang.  Experimental new approach.
 // A ConfigSet has exactly three lists (known as PQR) for each eligible named image.
 // They are: Prohibited arg keys, Qualifying values for arg keys, and Required arg keys.
@@ -8,7 +22,7 @@ import("./plist.slang").
 // P and R are k-lists, and Q is a k+v list.
 //
 // These keysets are asserted in predicates called prohibited, required, and qualifier.
-// Keyed by ConfigSetID and Image.
+// Keyed by ConfigSetID and Subinstance name.
 // Grouped in a single set labeled as ConfigSets/ConfigSetID.
 //
 // Note error rakes:
@@ -37,7 +51,7 @@ defpost postProhibited(?ConfigSetID, ?ImageID, ?ConfProhibited) :-
     [createProhibited(?ConfigSetID, ?ImageID, ?ConfProhibited)].
 
 defpost postRequired(?ConfigSetID,  ?ImageID, ?ConfRequired) :-
-    [createRequiredKeysPolicy(?ConfigSetID, ?ImageID, ?ConfRequired)].
+    [createRequired(?ConfigSetID, ?ImageID, ?ConfRequired)].
 
 defpost postQualifier(?ConfigSetID, ?ImageID, ?ConfQualifiers) :-
     [createQualifier(?ConfigSetID, ?ImageID, ?ConfQualifiers)].
@@ -64,12 +78,13 @@ defcon consSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) :-
     configSubinstance($Subinstance, $Instance, $Image, $ArgKeyset).
     label("instance/$Instance").
 }.
-defpost postSubinstanceConfig(?Subinstance, ?Instance,?Image,?ArgKeyset) :-
-    [ consInstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) ].
+defpost postSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) :-
+    [ consSubInstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) ].
+
+//postSubinstanceConfig kmaster ctn1 pod1 image_c1 '[[k1,v1],[k2,v2]]'
 
 
-
-defcon dtorInstanceConfigList(?Instance,?Config,?Value) :-
+defcon dtorInstanceConfig(?Instance,?Config,?Value) :-
 {
     config($Instance, $Config, $Value)~
     label("instance/$Instance").
