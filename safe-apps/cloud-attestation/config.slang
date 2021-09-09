@@ -79,7 +79,7 @@ defcon consSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) :-
     label("instance/$Instance").
 }.
 defpost postSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) :-
-    [ consSubInstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) ].
+    [ consSubinstanceConfig(?Subinstance,?Instance,?Image,?ArgKeyset) ].
 
 //postSubinstanceConfig kmaster ctn1 pod1 image_c1 '[[k1,v1],[k2,v2]]'
 
@@ -93,14 +93,30 @@ defcon dtorInstanceConfig(?Instance,?Config,?Value) :-
 defpost delInstanceConfig(?Instance,?Config,?Value) :-
     [ dtorInstanceConfig(?Instance,?Config,?Value) ].
 
+defguard configMatchSet(?Attester, ?Instance, ?Endorser, ?ConfigSet) :-
+    ?InstanceToken := label(?Attester, "instance/?Instance"),
+    ?ConfigSetToken := label(?Endorser, "ConfigSets/?ConfigSet"),
+    ?ListRules := label("property-list-rules"),
+    ?MatchRules := label("config-match-rules"), 
+{
+    link($InstanceToken).
+    link($ConfigSetToken).
+    link($ListRules).
+    link($MatchRules).
+
+    configMatch(?Instance, ?ConfigSet)?
+
+}.
+
 //
 // Logic rules for match, i.e., check compliance of a Config to a ConfigSet.
+// Note: these presume that Configs and ConfigSets are named by scids at the logic level.
 //
 
 defcon configSetMatchRules() :- 
 {
 
-    label("ConfigSetMatchRules").
+    label("config-match-rules").
 
     configMatch(AConfig, EConfigSet) :-
       getSubinstances(AConfig, ASubInstances),
@@ -132,6 +148,31 @@ defcon configSetMatchRules() :-
 //      intersecting(CProhibitedKeys, PList) ).
 
     getRequiredKeyset(EConfigSet, Image, RKeyset) :-
+      required(EConfigSet, Image, RKeyset).
+      
+    getQualifierKeyset(EConfigSet, Image, QKeyset) :-
+      qualifier(EConfigSet, Image, QKeyset).
+
+    getProhibitedKeyset(EConfigSet, Image, PKeyset) :-
+      prohibited(EConfigSet, Image, PKeyset).
+
+    getSubinstances(AConfig, ASubInstances) :-
+      configInstance(AConfig, "subinstances", ASubInstances).    
+
+    getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset) :-
+      configSubinstance(SubInstance, AConfig, Image, ArgKeyset).
+
+}.
+
+definit configSetMatchRules().
+definit listMatchingRules().
+
+/*
+    These are the proper logic getters.  Shortened to avoid dealing with scids
+    during testing from a shell client.  The shortened versions can work iff
+    the attester and endorser are both equal to $self at guard query time.
+
+    getRequiredKeyset(EConfigSet, Image, RKeyset) :-
       Owner := rootPrincipal(EConfigSet),
       Owner:required(EConfigSet, Image, RKeyset).
       
@@ -150,6 +191,5 @@ defcon configSetMatchRules() :-
     getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset) :-
       Owner := rootPrincipal(AConfig),
       Owner:configSubinstance(SubInstance, AConfig, Image, ArgKeyset).
-}.
 
-definit configSetMatchRules().
+*/

@@ -9,6 +9,8 @@ postProhibited strong-1 cset1 image_c2 '[k5]'
 postQualifier strong-1 cset1 image_c2 '[[k4,v4]]'
 postRequired strong-1 cset1 image_c2 '[k3]'
 
-postInstanceConfig strong-2 pod1 subinstances '[ctn1,ctn2]'
-postSubinstanceConfig strong-2 ctn1 pod1 image_c1 '[[k1,v1],[k2,v2]]'
-postSubinstanceConfig strong-2 ctn2 pod1 image_c2 '[[k3,v3],[k4,v4]]'
+postInstanceConfig strong-1 pod1 subinstances '[ctn1,ctn2]'
+postSubinstanceConfig strong-1 ctn1 pod1 image_c1 '[[k1,v1],[k2,v2]]'
+postSubinstanceConfig strong-1 ctn2 pod1 image_c2 '[[k3,v3],[k4,v4]]'
+
+configMatchSet strong-1 strong-1 pod1 strong-1 cset1

@@ -71,3 +71,11 @@ postProhibited() {
     curl -XPOST $SAFE_ADDR/postProhibited -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\"], \"auth\": \"${AUTH:-1}\"}"
 }
 
+#configMatchSet strong-1 strong-1 pod1 strong-1 cset1
+
+configMatchSet() {
+    local principal=$1
+    shift 1
+# ?Attester, ?Instance, ?Endorser, ?ConfigSet
+    curl -XPOST $SAFE_ADDR/configMatchSet -d "{ \"principal\": \"$principal\", \"methodParams\": [\"${1}\",\"${2}\",\"${3}\",\"${4}\"], \"auth\": \"${AUTH:-1}\"}"
+}
