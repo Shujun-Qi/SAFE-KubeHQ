@@ -165,9 +165,7 @@ defcon configSetMatchRules() :-
 
     violatesProhibited(EConfigSet, Image, ArgKeyset) :-
       getProhibitedKeyset(EConfigSet, Image, PKeyset),      
-      anyPropPresent(PKeyset, ArgKeySet).
-//      intersecting(CProhibitedKeys, PList) ).
-
+      anyPropPresent(PKeyset, ArgKeyset).
 
     getRequiredKeyset(EConfigSet, Image, RKeyset) :-
       required(EConfigSet, Image, RKeyset).
