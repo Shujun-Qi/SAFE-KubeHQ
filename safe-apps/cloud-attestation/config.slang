@@ -127,36 +127,36 @@ defcon configSetMatchRules() :-
 {
 
     label("config-match-rules").
+    resolving(match).
+    
+    // Wildcard matches to short-circuit 'required' check only for testing/debugging.
+    // Match iff I believe anything useful about the args.
+    // configMatch(AConfig, EConfigSet) :- configInstance(AConfig, _, _),required(EConfigSet, _, _).
+    // Match special case: skip all checks for (pod,cset).
+    // configMatch(pod,cset).
 
-configMatch(pod,cset).
-
-// Add this for arg/link checking: succeed if I know anything useful about the args (said by me).
-configMatch(AConfig, EConfigSet) :- configInstance(AConfig, _, _),required(EConfigSet, _, _).
+    // Special case match/allow ground facts for simple testing/debugging.  Mostly harmless.
+    // compliantSubinstances(pod, [ctn], cset).
+    // compliesRequired(cset, image_c1, [[k1,v1],[k2,v2]]).
 
     configMatch(AConfig, EConfigSet) :-
-      getSubinstances(AConfig, ASubInstances),
-      compliantSubInstances(AConfig, ASubInstances, EConfigSet).
-
-//    compliantSubInstances(pod, [ctn], cset).
+      getSubinstances(AConfig, ASubinstances),
+      compliantSubinstances(AConfig, ASubinstances, EConfigSet).
 
     // Tail: check each subinstance of a Config against PQR for EConfigSet.
-    compliantSubinstances(AConfig, [SubInstance|Rest], EConfigSet) :- 
-      getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset),
-//      compliesRequired(EConfigSet, Image, ArgKeyset),
-//      compliesQualifier(EConfigSet, Image, ArgKeyset),
-//      \+( violatesProhibited(EConfigSet, Image, ArgKeyset) ),
+    compliantSubinstances(AConfig, [Subinstance|Rest], EConfigSet) :- 
+      getSubinstanceConfig(AConfig, Subinstance, Image, ArgKeyset),
+      compliesRequired(EConfigSet, Image, ArgKeyset),
+      compliesQualifier(EConfigSet, Image, ArgKeyset),
+      \+( violatesProhibited(EConfigSet, Image, ArgKeyset) ),
       compliantSubinstances(AConfig, Rest, EConfigSet).
 
     // Base case for tail recursion.
     compliantSubinstances(_, [], _).
 
-      compliesRequired(cset, ctn, [[k1,v1],[k2,v2]]),
-
     compliesRequired(EConfigSet, Image, ArgKeyset) :-
-      getRequiredKeyset(EConfigSet, Image, RKeyset).
-      
-//AND for compliesRequired:
-//latte uses:      propsPresent(RKeyset, ArgKeyset).
+      getRequiredKeyset(EConfigSet, Image, RKeyset),
+      propsPresent(RKeyset, ArgKeyset).
 //      subseq(CRequiredKeys, PList),
 
     compliesQualifier(EConfigSet, Image, ArgKeyset) :-
@@ -165,8 +165,7 @@ configMatch(AConfig, EConfigSet) :- configInstance(AConfig, _, _),required(EConf
 
     violatesProhibited(EConfigSet, Image, ArgKeyset) :-
       getProhibitedKeyset(EConfigSet, Image, PKeyset),      
-      anyPropPresent(PKeyset, ArgKeySet).
-//      intersecting(CProhibitedKeys, PList) ).
+      anyPropPresent(PKeyset, ArgKeyset).
 
     getRequiredKeyset(EConfigSet, Image, RKeyset) :-
       required(EConfigSet, Image, RKeyset).
@@ -177,12 +176,11 @@ configMatch(AConfig, EConfigSet) :- configInstance(AConfig, _, _),required(EConf
     getProhibitedKeyset(EConfigSet, Image, PKeyset) :-
       prohibited(EConfigSet, Image, PKeyset).
 
-    getSubinstances(AConfig, ASubInstances) :-
-      configInstance(AConfig, "subinstances", ASubInstances).    
+    getSubinstances(AConfig, ASubinstances) :-
+      configInstance(AConfig, "subinstances", ASubinstances).    
 
-    getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset) :-
-      configSubinstance(SubInstance, AConfig, Image, ArgKeyset).
-
+    getSubinstanceConfig(AConfig, Subinstance, Image, ArgKeyset) :-
+      configSubinstance(Subinstance, AConfig, Image, ArgKeyset).
 }.
 
 definit configSetMatchRules().
@@ -205,12 +203,12 @@ definit listMatchingRules().
       Owner := rootPrincipal(EConfigSet),
       Owner:prohibited(EConfigSet, Image, PKeyset).
 
-    getSubinstances(AConfig, ASubInstances) :-
+    getSubinstances(AConfig, ASubinstances) :-
       Owner := rootPrincipal(AConfig),
-      Owner:configInstance(AConfig, "subinstances", ASubInstances).    
+      Owner:configInstance(AConfig, "subinstances", ASubinstances).    
 
     getSubinstanceConfig(AConfig, SubInstance, Image, ArgKeyset) :-
       Owner := rootPrincipal(AConfig),
-      Owner:configSubinstance(SubInstance, AConfig, Image, ArgKeyset).
+      Owner:configSubinstance(Subinstance, AConfig, Image, ArgKeyset).
 
 */
