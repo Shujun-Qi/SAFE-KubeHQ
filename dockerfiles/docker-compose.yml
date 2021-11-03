@@ -2,7 +2,7 @@ version: '3.3'
 services:
 
   riak:
-    image: riak.local:latest
+    image: iqicheng/riak:latest
     build:
       context: ./riak/
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
       - '8087:8087'
 
   safe:
-    image: safe.local:latest
+    image: iqicheng/safe:latest
     build:
       context: ./safe/
       dockerfile: Dockerfile
@@ -25,7 +25,7 @@ services:
       - '7777:7777'
     environment:
       - RIAK_IP=riak
-      - SLANG_SCRIPT=strong/strong.slang
+      - SLANG_SCRIPT=cloud-attestation/config.slang
       - SLANG_CONF=strong/strong.conf.slang
       - STRONG_ROOT_PUB=strong-1.pub
     volumes:

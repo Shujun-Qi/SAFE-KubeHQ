@@ -9,7 +9,7 @@ RUN cd ~/ && wget https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/s
 
 # Download SAFE
 RUN cd ~/ && git clone https://github.com/RENCI-NRIG/SAFE.git
-RUN cd ~/SAFE && git pull origin master
+RUN cd ~/SAFE && git pull origin jc21
 # RUN cd ~/SAFE && git pull origin master && git checkout working-session
 
 # Compile SAFE

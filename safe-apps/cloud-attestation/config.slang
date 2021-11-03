@@ -106,8 +106,11 @@ defguard configMatchSet(?Attester, ?Instance, ?Endorser, ?ConfigSet) :-
 //  link($ConfigSetToken).
 // Until that happy day we hardwire set links for test scenario.
 
-    link('mac6Mkn2BB0yZ4SHFakqSLf0FvtlwDtVQ0ellN5ibLo=').
-    link('nafxpum0XMwwIMXV7rR1DXtlwhzzfaTz-3yXBGwJ27M=').
+    // link('mac6Mkn2BB0yZ4SHFakqSLf0FvtlwDtVQ0ellN5ibLo=').
+    // link('nafxpum0XMwwIMXV7rR1DXtlwhzzfaTz-3yXBGwJ27M=').
+
+    link('dI-bEW92hkhGR6xO5djFraoKSqA1BQ9cRtqD8-9lKZ8=').
+    link('IgcwalLtB8ZhJ3vHAQuOuk7CXa3OyxGl0l8w1UHSrm8=').
 
     link($ListRules).
     link($MatchRules).
@@ -131,17 +134,26 @@ defcon configSetMatchRules() :-
     
     // Wildcard matches to short-circuit 'required' check only for testing/debugging.
     // Match iff I believe anything useful about the args.
-    // configMatch(AConfig, EConfigSet) :- configInstance(AConfig, _, _),required(EConfigSet, _, _).
+    // configMatch(AConfig, EConfigSet) :- 
+    //   compliesRequired(cset, image_c1, [[k1,v1],[k2,v2]]).
     // Match special case: skip all checks for (pod,cset).
     // configMatch(pod,cset).
 
     // Special case match/allow ground facts for simple testing/debugging.  Mostly harmless.
-    // compliantSubinstances(pod, [ctn], cset).
-    // compliesRequired(cset, image_c1, [[k1,v1],[k2,v2]]).
+    // compliantSubinstances(pod, [ctn1, ctn2], cset).
+      // propsPresent([k1],[[k1,v1],[k2,v2]]).
+      // compliesQualifier(cset, image_c1, [[k1,v1],[k2,v2]]).
+      // esubseq([[k1,v1]],[[k1,v1],[k2,v2]]).
+      // getSubinstanceConfig(AConfig, ctn1, Image, ArgKeyset),
+      // required(EConfigSet, Image, RKeyset).
+      // qualifier(EConfigSet, Image, QKeyset).
+      // propsPresent(RKeyset, ArgKeyset).
+      // compliesRequired(EConfigSet, Image, ArgKeyset).
 
     configMatch(AConfig, EConfigSet) :-
       getSubinstances(AConfig, ASubinstances),
       compliantSubinstances(AConfig, ASubinstances, EConfigSet).
+      // compliantSubinstances(pod, ASubinstances, cset).
 
     // Tail: check each subinstance of a Config against PQR for EConfigSet.
     compliantSubinstances(AConfig, [Subinstance|Rest], EConfigSet) :- 
@@ -157,7 +169,7 @@ defcon configSetMatchRules() :-
     compliesRequired(EConfigSet, Image, ArgKeyset) :-
       getRequiredKeyset(EConfigSet, Image, RKeyset),
       propsPresent(RKeyset, ArgKeyset).
-//      subseq(CRequiredKeys, PList),
+    //  subseq(CRequiredKeys, PList).
 
     compliesQualifier(EConfigSet, Image, ArgKeyset) :-
       getQualifierKeyset(EConfigSet, Image, QKeyset),
