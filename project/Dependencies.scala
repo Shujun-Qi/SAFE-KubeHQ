@@ -72,7 +72,11 @@ object Dependencies {
   // support operations on IP address
   val net = Seq(
       "commons-net"        % "commons-net"       % "3.4"
-    , "com.google.guava"   % "guava"             % "19.0"
+    , "com.google.guava"   % "guava"             % "12.0"
+  )
+
+  val netty = Seq(
+      "io.netty"           % "netty"             % "3.8.0.Final"
   )
 
   val async = Seq(
@@ -109,7 +113,8 @@ object Dependencies {
     // MapDB provides concurrent Maps, Sets and Queues backed by disk storage or off-heap memory.
      //"org.mapdb"                % "mapdb"                      % "1.0.6"
       "io.spray"          % s"spray-caching_${V.libScala}"     % V.spray
-    , "com.google.guava"  % "guava"                            % "19.0"
+    , "com.google.guava"  % "guava"                            % "12.0"
+    , "io.netty"           % "netty"             % "3.8.0.Final"
 
   )
 

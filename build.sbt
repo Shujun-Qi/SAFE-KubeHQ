@@ -178,6 +178,7 @@ lazy val safeServer = safeProject("safe-server")
     // default main to start when "run" cmd is issued from sbt repl
     // mainClass in (Compile, run) := Some("safe.server.BootService"),
     libraryDependencies     ++= safeServerDeps,
+    
     outputStrategy          := Some(StdoutOutput), // send child output to stdout
     resolvers               := commonResolvers,
     scalacOptions           ++= commonOps,
@@ -228,6 +229,7 @@ lazy val safeStyla = safeProject("safe-styla")
     sbtConnectInput in run  := true,   // send stdin to children
     fork                    := true,
     libraryDependencies     ++= safeStylaDeps,
+    //dependencyOverrides += "com.google.guava"   % "guava"             % "12.0",
     outputStrategy          := Some(StdoutOutput), // send child output to stdout
     resolvers               := commonResolvers,
     scalacOptions           ++= commonOps

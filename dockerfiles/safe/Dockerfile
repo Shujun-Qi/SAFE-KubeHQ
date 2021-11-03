@@ -13,11 +13,11 @@ RUN cd ~/SAFE && git pull origin jc21
 # RUN cd ~/SAFE && git pull origin master && git checkout working-session
 
 # Compile SAFE
-RUN cd ~/SAFE && ~/sbt/bin/sbt "project safe-server" "compile"
+RUN cd ~/SAFE-TEST && ~/sbt/bin/sbt "project safe-server" "compile"
 
 COPY start.sh     /root/
 COPY test.sh      /root/
-RUN cd ~/SAFE && cp utility/safe_keygen.sh /root/ && cp utility/hash_gen.py /root/
+RUN cd ~/SAFE-TEST && cp utility/safe_keygen.sh /root/ && cp utility/hash_gen.py /root/
 
 VOLUME ["/imports", "/principalkeys"]
 ENTRYPOINT ["/bin/bash", "/root/start.sh"]
