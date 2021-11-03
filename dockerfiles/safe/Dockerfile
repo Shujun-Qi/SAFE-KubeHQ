@@ -8,16 +8,20 @@ ENV SBT_VERSION 1.2.8
 RUN cd ~/ && wget https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz && cd ~/ && tar -zxvf sbt-${SBT_VERSION}.tgz
 
 # Download SAFE
-RUN cd ~/ && git clone https://github.com/RENCI-NRIG/SAFE.git
-RUN cd ~/SAFE && git pull origin jc21
+# RUN cd ~/ && git clone https://github.com/RENCI-NRIG/SAFE.git
+# RUN cd ~/SAFE && git pull origin master
+RUN cd ~/ && git clone https://github.com/Shujun-Qi/SAFE-KubeHQ.git
+RUN cd ~/SAFE-KubeHQ && git pull origin master
 # RUN cd ~/SAFE && git pull origin master && git checkout working-session
 
 # Compile SAFE
-RUN cd ~/SAFE-TEST && ~/sbt/bin/sbt "project safe-server" "compile"
+# RUN cd ~/SAFE && ~/sbt/bin/sbt "project safe-server" "compile"
+RUN cd ~/SAFE-KubeHQ && ~/sbt/bin/sbt "project safe-server" "compile"
 
 COPY start.sh     /root/
 COPY test.sh      /root/
-RUN cd ~/SAFE-TEST && cp utility/safe_keygen.sh /root/ && cp utility/hash_gen.py /root/
+# RUN cd ~/SAFE && cp utility/safe_keygen.sh /root/ && cp utility/hash_gen.py /root/
+RUN cd ~/SAFE-KubeHQ && cp utility/safe_keygen.sh /root/ && cp utility/hash_gen.py /root/
 
 VOLUME ["/imports", "/principalkeys"]
 ENTRYPOINT ["/bin/bash", "/root/start.sh"]

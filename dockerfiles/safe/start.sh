@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run SAFE server
 
-cd ~/SAFE
+cd ~/SAFE-KubeHQ
 
 # Set up: configuration the storage server for SAFE
 sed -i "/.*url = \"http/ s:.*:    url = \"http\://${RIAK_IP}\:8098/types/safesets/buckets/safe/keys\":" safe-server/src/main/resources/application.conf
